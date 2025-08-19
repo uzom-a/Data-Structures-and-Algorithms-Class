@@ -71,15 +71,17 @@ def main():
     print("------------------------------------")
 
     print("What task you want to perform: ")
-    print("Create - Create User")
-    print("DELETE - Delete User")
-    print("VIEW - View User")
-    print("VIEWALL - View all user")
+    print("Create - Create Student")
+    print("DELETE - Delete Student")
+    print("VIEW - View Student")
+    print("VIEWALL - View all Student Records")
     
 
 
 
     userInteraction()
+
+main()
 
 # test case needed
 
