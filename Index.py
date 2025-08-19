@@ -65,8 +65,23 @@ def validateGrade(grade):
     
 
 
+def main():
+    print("------------------------------------")
+    print("Welcome to Student Portal")
+    print("------------------------------------")
+
+    print("What task you want to perform: ")
+    print("Create - Create User")
+    print("DELETE - Delete User")
+    print("VIEW - View User")
+    print("VIEWALL - View all user")
+    
+
+
+
+    userInteraction()
+
 # test case needed
-userInteraction()
 
 
 # additional functions
