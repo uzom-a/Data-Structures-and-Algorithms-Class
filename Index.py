@@ -86,7 +86,7 @@ main()
 # test case needed
 
 
-# additional functions
+# additional functions and display the average, maximum and minimum
 """
 def displayUsers():
     pass
