@@ -16,8 +16,37 @@ def userInteraction():
 
 
 # Kelvin
-def saveUser(name, grade, category):
-    pass
+def saveUser(name, grade, classification):
+    try:
+        if len(names) < 10:
+            names.append(name)
+        else:
+            raise Exception("Database already has names of 10 students")
+
+    except Exception as failed:
+        print("Error", failed)
+
+    try:
+        if len(grades) < 10:
+            grade.append(grade)
+        else:
+            raise Exception("Database already has grade of 10 students")
+
+    except Exception as Error:
+        print("Error", Error)
+
+    try:
+        if len(category) < 10:
+            category.append(classification)
+        else:
+            raise Exception(
+                "Cannot classify student grade as the limit of 10 students have been reached"
+            )
+
+    except Exception as mistake:
+        print("Error", mistake)
+
+    # pass
 
 
 # Agrawal
