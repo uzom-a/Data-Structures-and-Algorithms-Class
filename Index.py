@@ -11,7 +11,8 @@ def categorization(marks):
 
 # Uzoma
 def userInteraction():
-    pass
+    name = input("Enter the student's name: ")
+    grade = int(input("Enter the student's grade: "))
 
 
 # Kelvin
