@@ -6,7 +6,15 @@ category = []
 
 # Agrawal
 def categorization(marks):
-    pass
+    
+    if marks < 70:
+        return "Needs Improvement"
+    elif marks < 80:
+        return "Average"
+    elif marks < 90:
+        return "Good"
+    else:
+        return "Excellent"
 
 
 # Uzoma
@@ -50,8 +58,11 @@ def saveUser(name, grade, classification):
 
 
 # Agrawal
-def validateGrade():
-    pass
+def validateGrade(grade):
+    if grade > 100 or grade < 0:
+        return False
+    return True
+    
 
 
 # test case needed
