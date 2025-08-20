@@ -1,7 +1,7 @@
 names = []
 grades = []
 categories = []
-student_ids = []  # Unique IDs for each student
+student_ids = []  # Unique ID for each student
 
 # Dharambir
 def categorize_grade(marks):
@@ -38,7 +38,7 @@ def add_student():
     student_ids.append(len(student_ids) + 1)
     print(f"Student '{name}' added successfully.")
 
-# 
+# Kelvin
 def display_students():
     if not names:
         print("No student records to display.")
