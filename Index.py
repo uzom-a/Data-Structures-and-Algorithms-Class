@@ -1,12 +1,10 @@
-DB = []
 names = []
 grades = []
-category = []
+categories = []
+student_ids = []  # Unique IDs for each student
 
-
-# Agrawal
-def categorization(marks):
-    
+# Dharambir
+def categorize_grade(marks):
     if marks < 70:
         return "Needs Improvement"
     elif marks < 80:
@@ -16,82 +14,96 @@ def categorization(marks):
     else:
         return "Excellent"
 
-
+# Dharambir
+def validate_grade(grade):
+    return 0 <= grade <= 100
 # Uzoma
-def userInteraction():
-    name = input("Enter the student's name: ")
-    grade = int(input("Enter the student's grade: "))
-
-
-# Kelvin
-def saveUser(name, grade, classification):
+def add_student():
+    if len(names) >= 10:
+        print("Cannot add more students. Limit of 10 reached.")
+        return
+    name = input("Enter the student's name: ").strip()
     try:
-        if len(names) < 10:
-            names.append(name)
-        else:
-            raise Exception("Database already has names of 10 students")
+        grade = int(input("Enter the student's grade (0-100): "))
+    except ValueError:
+        print("Invalid input. Grade must be an integer.")
+        return
+    if not validate_grade(grade):
+        print("Grade must be between 0 and 100.")
+        return
+    category = categorize_grade(grade)
+    names.append(name)
+    grades.append(grade)
+    categories.append(category)
+    student_ids.append(len(student_ids) + 1)
+    print(f"Student '{name}' added successfully.")
 
-    except Exception as failed:
-        print("Error", failed)
+# 
+def display_students():
+    if not names:
+        print("No student records to display.")
+        return
+    print("\n{:<5} {:<15} {:<7} {:<18}".format("ID", "Name", "Grade", "Category"))
+    print("-" * 45)
+    for i in range(len(names)):
+        print("{:<5} {:<15} {:<7} {:<18}".format(student_ids[i], names[i], grades[i], categories[i]))
+    print("-" * 45)
+    print(f"Average Grade: {average_grade():.2f}")
+    print(f"Maximum Grade: {max_grade()}")
+    print(f"Minimum Grade: {min_grade()}")
 
+# Dharambir
+def average_grade():
+    return sum(grades) / len(grades) if grades else 0
+
+def max_grade():
+    return max(grades) if grades else 0
+
+def min_grade():
+    return min(grades) if grades else 0
+
+def delete_student():
+    if not names:
+        print("No students to delete.")
+        return
     try:
-        if len(grades) < 10:
-            grade.append(grade)
-        else:
-            raise Exception("Database already has grade of 10 students")
-
-    except Exception as Error:
-        print("Error", Error)
-
-    try:
-        if len(category) < 10:
-            category.append(classification)
-        else:
-            raise Exception(
-                "Cannot classify student grade as the limit of 10 students have been reached"
-            )
-
-    except Exception as mistake:
-        print("Error", mistake)
-
-    # pass
-
-
-# Agrawal
-def validateGrade(grade):
-    if grade > 100 or grade < 0:
-        return False
-    return True
-    
-
+        sid = int(input("Enter the student ID to delete: "))
+    except ValueError:
+        print("Invalid input. ID must be an integer.")
+        return
+    if sid in student_ids:
+        idx = student_ids.index(sid)
+        print(f"Deleting student: {names[idx]}")
+        del names[idx]
+        del grades[idx]
+        del categories[idx]
+        del student_ids[idx]
+        print("Student deleted successfully.")
+    else:
+        print("Student ID not found.")
 
 def main():
     print("------------------------------------")
     print("Welcome to Student Portal")
     print("------------------------------------")
+    while True:
+        print("\nSelect an option:")
+        print("1 - Add Student")
+        print("2 - View All Students")
+        print("3 - Delete Student")
+        print("4 - Exit")
+        choice = input("Enter your choice: ").strip()
+        if choice == "1":
+            add_student()
+        elif choice == "2":
+            display_students()
+        elif choice == "3":
+            delete_student()
+        elif choice == "4":
+            print("Exiting program.")
+            break
+        else:
+            print("Invalid choice. Please select 1-4.")
 
-    print("What task you want to perform: ")
-    print("Create - Create Student")
-    print("DELETE - Delete Student")
-    print("VIEW - View Student")
-    print("VIEWALL - View all Student Records")
-    
-
-
-
-    userInteraction()
-
-main()
-
-# test case needed
-
-
-# additional functions and display the average, maximum and minimum
-"""
-def displayUsers():
-    pass
-
-def deleteUsers():
-    pass
-    
-"""
+if __name__ == "__main__":
+    main()
