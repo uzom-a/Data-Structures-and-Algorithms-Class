@@ -3,6 +3,7 @@
 # not accepting numbers as name
 # add count for the number of student to add
 # display number of student added already
+# make powerpoint
 
 names = []
 grades = []
