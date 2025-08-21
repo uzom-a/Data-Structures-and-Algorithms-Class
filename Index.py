@@ -2,6 +2,7 @@ names = []
 grades = []
 categories = []
 student_ids = []
+global_id = 1
 
 
 # Dharambir
@@ -23,6 +24,7 @@ def validate_grade(grade):
 
 # Uzoma
 def add_student():
+    global global_id
     if len(names) >= 10:
         print("Cannot add more students. Limit of 10 reached.")
         return
@@ -39,8 +41,9 @@ def add_student():
     names.append(name)
     grades.append(grade)
     categories.append(category)
-    student_ids.append(len(student_ids) + 1)
+    student_ids.append(global_id)
     print(f"Student '{name}' added successfully.")
+    global_id += 1
 
 
 # Kelvin
