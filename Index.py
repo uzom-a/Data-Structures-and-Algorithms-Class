@@ -1,6 +1,6 @@
 # no option to add after limit reached (Kelvin)
 # directly able to edit the name and grade (Dharambir)
-# not accepting numbers as name (Kelvin)
+# not accepting numbers as name (Kelvin) ***
 # add count for the number of student to add (Dharambir)
 # display number of student added already (Kelvin)
 # no option for deleting student at the beginning (uzoma)
@@ -33,7 +33,12 @@ def add_student():
     if len(names) >= 10:
         print("Cannot add more students. Limit of 10 reached.")
         return
-    name = input("Enter the student's name: ").strip()
+    while True:
+        name = input("Enter the student's name: ").strip()
+        if all(part.isalpha() for part in name.split()):
+            break
+        else:
+            print("Invalid input. Name must contain only letters and spaces")
     try:
         grade = int(input("Enter the student's grade (0-100): "))
     except ValueError:
@@ -97,9 +102,18 @@ def delete_student():
         del grades[idx]
         del categories[idx]
         del student_ids[idx]
-        print("Student deleted successfully.")
+        print("Student deleted successfully.\n")
     else:
         print("Student ID not found.")
+
+
+# no option to add after limit reached (Kelvin)
+# directly able to edit the name and grade (Dharambir)
+# not accepting numbers as name (Kelvin) ***
+# add count for the number of student to add (Dharambir)
+# display number of student added already (Kelvin)
+# no option for deleting student at the beginning (uzoma)
+# make powerpoint (uzoma)
 
 
 def main():
@@ -108,9 +122,13 @@ def main():
     print("------------------------------------")
     while True:
 
-        print("\nSelect an option:")
-        print("1 - Add Student")
-        print("2 - View All Students")
+        print(f"\n{len(names)} students added")
+        print(f"There are {(10 - len(names))} more name(s) to add")
+        print("Select an option:")
+        if len(names) < 10:
+            print("1 - Add Student")
+        if len(names) > 0:
+            print("2 - View All Students")
         if names:
             print("3 - Delete Student")
         print("4 - Exit")
