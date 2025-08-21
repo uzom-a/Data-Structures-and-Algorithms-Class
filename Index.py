@@ -1,7 +1,7 @@
 names = []
 grades = []
 categories = []
-student_ids = []  # Unique ID for each student
+student_ids = []
 
 
 # Dharambir
@@ -85,9 +85,6 @@ def delete_student():
         print("Invalid input. ID must be an integer.")
         return
     if sid in student_ids:
-        """since sid will correspond to the index (in this case where we are
-        using a 1-based indexing, do you still think we need to execute line 78??
-        )"""
         idx = student_ids.index(sid)
         print(f"Deleting student: {names[idx]}")
         del names[idx]
@@ -114,6 +111,9 @@ def main():
             add_student()
         elif choice == "2":
             display_students()
+            print(names)
+            print(student_ids)
+
         elif choice == "3":
             delete_student()
         elif choice == "4":
