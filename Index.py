@@ -107,10 +107,12 @@ def main():
     print("Welcome to Student Portal")
     print("------------------------------------")
     while True:
+
         print("\nSelect an option:")
         print("1 - Add Student")
         print("2 - View All Students")
-        print("3 - Delete Student")
+        if names:
+            print("3 - Delete Student")
         print("4 - Exit")
         choice = input("Enter your choice: ").strip()
         if choice == "1":
