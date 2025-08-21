@@ -5,7 +5,6 @@ student_ids = []
 global_id = 1
 
 
-# Dharambir
 def categorize_grade(marks):
     if marks < 70:
         return "Needs Improvement"
@@ -17,12 +16,10 @@ def categorize_grade(marks):
         return "Excellent"
 
 
-# Dharambir
 def validate_grade(grade):
     return 0 <= grade <= 100
 
 
-# Uzoma
 def add_student():
     global global_id
     if len(names) >= 10:
@@ -46,7 +43,6 @@ def add_student():
     global_id += 1
 
 
-# Kelvin
 def display_students():
     if not names:
         print("No student records to display.")
@@ -65,7 +61,6 @@ def display_students():
     print(f"Minimum Grade: {min_grade()}")
 
 
-# Dharambir
 def average_grade():
     return sum(grades) / len(grades) if grades else 0
 
