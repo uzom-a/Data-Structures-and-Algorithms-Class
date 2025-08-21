@@ -3,6 +3,7 @@ grades = []
 categories = []
 student_ids = []  # Unique ID for each student
 
+
 # Dharambir
 def categorize_grade(marks):
     if marks < 70:
@@ -14,9 +15,12 @@ def categorize_grade(marks):
     else:
         return "Excellent"
 
+
 # Dharambir
 def validate_grade(grade):
     return 0 <= grade <= 100
+
+
 # Uzoma
 def add_student():
     if len(names) >= 10:
@@ -38,6 +42,7 @@ def add_student():
     student_ids.append(len(student_ids) + 1)
     print(f"Student '{name}' added successfully.")
 
+
 # Kelvin
 def display_students():
     if not names:
@@ -46,21 +51,29 @@ def display_students():
     print("\n{:<5} {:<15} {:<7} {:<18}".format("ID", "Name", "Grade", "Category"))
     print("-" * 45)
     for i in range(len(names)):
-        print("{:<5} {:<15} {:<7} {:<18}".format(student_ids[i], names[i], grades[i], categories[i]))
+        print(
+            "{:<5} {:<15} {:<7} {:<18}".format(
+                student_ids[i], names[i], grades[i], categories[i]
+            )
+        )
     print("-" * 45)
     print(f"Average Grade: {average_grade():.2f}")
     print(f"Maximum Grade: {max_grade()}")
     print(f"Minimum Grade: {min_grade()}")
 
+
 # Dharambir
 def average_grade():
     return sum(grades) / len(grades) if grades else 0
 
+
 def max_grade():
     return max(grades) if grades else 0
 
+
 def min_grade():
     return min(grades) if grades else 0
+
 
 def delete_student():
     if not names:
@@ -72,6 +85,9 @@ def delete_student():
         print("Invalid input. ID must be an integer.")
         return
     if sid in student_ids:
+        """since sid will correspond to the index (in this case where we are
+        using a 1-based indexing, do you still think we need to execute line 78??
+        )"""
         idx = student_ids.index(sid)
         print(f"Deleting student: {names[idx]}")
         del names[idx]
@@ -81,6 +97,7 @@ def delete_student():
         print("Student deleted successfully.")
     else:
         print("Student ID not found.")
+
 
 def main():
     print("------------------------------------")
@@ -104,6 +121,7 @@ def main():
             break
         else:
             print("Invalid choice. Please select 1-4.")
+
 
 if __name__ == "__main__":
     main()
