@@ -111,9 +111,6 @@ def main():
             add_student()
         elif choice == "2":
             display_students()
-            print(names)
-            print(student_ids)
-
         elif choice == "3":
             delete_student()
         elif choice == "4":
