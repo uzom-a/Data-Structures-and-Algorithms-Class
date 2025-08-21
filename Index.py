@@ -1,9 +1,10 @@
-# no option to add after limit reached
-# directly able to edit the name and grade
-# not accepting numbers as name
-# add count for the number of student to add
-# display number of student added already
-# make powerpoint
+# no option to add after limit reached (Kelvin)
+# directly able to edit the name and grade (Dharambir)
+# not accepting numbers as name (Kelvin)
+# add count for the number of student to add (Dharambir)
+# display number of student added already (Kelvin)
+# no option for deleting student at the beginning (uzoma)
+# make powerpoint (uzoma)
 
 names = []
 grades = []
