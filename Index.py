@@ -1,3 +1,9 @@
+# no option to add after limit reached
+# directly able to edit the name and grade
+# not accepting numbers as name
+# add count for the number of student to add
+# display number of student added already
+
 names = []
 grades = []
 categories = []
