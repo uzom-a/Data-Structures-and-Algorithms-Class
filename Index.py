@@ -30,23 +30,26 @@ def validate_grade(grade):
 
 def add_student():
     global global_id
-    if len(names) >= 10:
-        print("Cannot add more students. Limit of 10 reached.")
-        return
+    # validating the name
     while True:
         name = input("Enter the student's name: ").strip()
         if all(part.isalpha() for part in name.split()):
             break
         else:
             print("Invalid input. Name must contain only letters and spaces")
-    try:
-        grade = int(input("Enter the student's grade (0-100): "))
-    except ValueError:
-        print("Invalid input. Grade must be an integer.")
-        return
-    if not validate_grade(grade):
-        print("Grade must be between 0 and 100.")
-        return
+    # validating the grade
+    while True:
+        try:
+            grade = int(input("Enter the student's grade (0-100): "))
+            if not validate_grade(grade):
+                print("Grade must be between 0 and 100.")
+            else:
+                break
+        except ValueError:
+            print("Invalid input. Grade must be an integer.")
+            # return
+
+        # return
     category = categorize_grade(grade)
     names.append(name)
     grades.append(grade)
@@ -134,7 +137,19 @@ def main():
         print("4 - Exit")
         choice = input("Enter your choice: ").strip()
         if choice == "1":
-            add_student()
+            if len(names) >= 10:
+                print("Cannot add more students. Limit of 10 reached.")
+            else:
+                a = input(f"How many student(s) you want to add between 1 and {10 - len(names)}: ")
+                try:
+                    num_students = int(a)
+                    if 1 <= num_students <= (10 - len(names)):
+                        for _ in range(num_students):
+                            add_student()
+                    else:
+                        print(f"Invalid number. Please enter a number between 1 and {10 - len(names)}.")
+                except ValueError:
+                    print("Invalid input. Please enter a valid number.")
         elif choice == "2":
             display_students()
         elif choice == "3":
