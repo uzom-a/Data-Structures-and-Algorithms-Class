@@ -4,7 +4,6 @@
 # add count for the number of student to add (Dharambir)
 # display number of student added already (Kelvin)
 # no option for deleting student at the beginning (uzoma)
-# make powerpoint (uzoma)
 
 names = []
 grades = []
@@ -13,6 +12,7 @@ student_ids = []
 global_id = 1
 
 
+# Dharambir
 def categorize_grade(marks):
     if marks < 70:
         return "Needs Improvement"
@@ -24,10 +24,12 @@ def categorize_grade(marks):
         return "Excellent"
 
 
+# Dharambir
 def validate_grade(grade):
     return 0 <= grade <= 100
 
 
+# Uzoma
 def add_student():
     global global_id
     # validating the name
@@ -59,6 +61,7 @@ def add_student():
     global_id += 1
 
 
+# Kelvin
 def display_students():
     if not names:
         print("No student records to display.")
@@ -77,48 +80,55 @@ def display_students():
     print(f"Minimum Grade: {min_grade()}")
 
 
+# Dharambir
 def average_grade():
     return sum(grades) / len(grades) if grades else 0
 
 
+# Dharambir  
 def max_grade():
     return max(grades) if grades else 0
 
 
+# Dharambir
 def min_grade():
     return min(grades) if grades else 0
 
 
+# Uzoma
 def delete_student():
     if not names:
         print("No students to delete.")
         return
-    try:
-        sid = int(input("Enter the student ID to delete: "))
-    except ValueError:
-        print("Invalid input. ID must be an integer.")
-        return
-    if sid in student_ids:
-        idx = student_ids.index(sid)
-        print(f"Deleting student: {names[idx]}")
-        del names[idx]
-        del grades[idx]
-        del categories[idx]
-        del student_ids[idx]
-        print("Student deleted successfully.\n")
-    else:
-        print("Student ID not found.")
+    
+    # Display current students for reference
+    print("\nCurrent Students:")
+    print("{:<5} {:<15}".format("ID", "Name"))
+    print("-" * 20)
+    for i in range(len(names)):
+        print("{:<5} {:<15}".format(student_ids[i], names[i]))
+    print("-" * 20)
+    
+    # Persistent validation for student ID
+    while True:
+        try:
+            sid = int(input("Enter the student ID to delete: "))
+            if sid in student_ids:
+                idx = student_ids.index(sid)
+                print(f"Deleting student: {names[idx]}")
+                del names[idx]
+                del grades[idx]
+                del categories[idx]
+                del student_ids[idx]
+                print("Student deleted successfully.\n")
+                break
+            else:
+                print("Student ID not found. Please enter a valid ID from the list above.")
+        except ValueError:
+            print("Invalid input. ID must be an integer. Please try again.")
 
 
-# no option to add after limit reached (Kelvin)
-# directly able to edit the name and grade (Dharambir)
-# not accepting numbers as name (Kelvin) ***
-# add count for the number of student to add (Dharambir)
-# display number of student added already (Kelvin)
-# no option for deleting student at the beginning (uzoma)
-# make powerpoint (uzoma)
-
-
+# Kelvin - Main program and menu system
 def main():
     print("------------------------------------")
     print("Welcome to Student Portal")

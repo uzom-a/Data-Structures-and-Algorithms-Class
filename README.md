@@ -139,23 +139,68 @@ Maximum Grade: 95
 Minimum Grade: 67
 ```
 
-## Input Validation
+## User-Friendly Features
 
-### Grade Validation
+### 1. Smart Input Validation with Retry Loops
+Instead of returning to the main menu on invalid input, the system allows users to correct their mistakes immediately:
+
+#### Name Validation
+- **Requirement**: Names must contain only letters and spaces
+- **User-Friendly**: Continuous prompt until valid name is entered
+- **Smart Logic**: Rejects pure numbers but allows letter-only names with spaces
+- **Example**: "John Smith" ✅, "123" ❌, "John2" ❌
+
+#### Grade Validation  
+- **Requirement**: Integer between 0-100
+- **User-Friendly**: Persistent validation loop with specific error messages
+- **Handles**: Both type errors (non-integers) and range errors (out of bounds)
+- **Benefit**: User doesn't lose progress when making input mistakes
+
+### 2. Dynamic Context-Aware Menu System
+The menu adapts based on current system state:
+- **Add Student**: Only shown when under 10-student limit
+- **View Students**: Only appears when students exist
+- **Delete Student**: Hidden when no students are registered
+- **Real-time Status**: Shows current student count and remaining capacity
+
+### 3. Batch Student Addition
+- **Feature**: Add multiple students in one session
+- **Smart Prompting**: Shows exact range of allowed additions
+- **Efficiency**: Reduces menu navigation for multiple entries
+- **Example**: "How many student(s) you want to add between 1 and 7:"
+
+### 4. Comprehensive Error Recovery
+- **No System Crashes**: All invalid inputs are caught and handled
+- **Clear Messages**: Specific error descriptions for each validation failure
+- **Retry Opportunities**: Users can correct mistakes without losing context
+- **Graceful Degradation**: System continues functioning even with invalid inputs
+
+### Input Validation Details
+
+#### Grade Validation
 - Must be integer between 0-100
-- Non-integer inputs are rejected
-- Out-of-range values are rejected
+- Non-integer inputs prompt for retry
+- Out-of-range values show specific error messages
+- Validation loop continues until correct input
 
-### Student Limit
-- Maximum 10 students allowed
-- Addition blocked when limit reached
-- Clear error messages provided
+#### Name Validation
+- Must contain only alphabetic characters and spaces
+- Numbers in names are rejected
+- Empty names are rejected
+- Continuous validation until proper format
 
-### Error Handling
-- Invalid menu selections
+#### Student Limit Management
+- Maximum 10 students enforced
+- Dynamic capacity display
+- Intelligent menu option filtering
+- Clear limit-reached messaging
+
+#### Error Handling Scenarios
+- Invalid menu selections with retry prompts
 - Non-numeric input for grades and IDs
-- Empty dataset operations
-- Student ID not found scenarios
+- Empty dataset operations handled gracefully
+- Student ID not found scenarios with clear messages
+- Batch addition validation with range checking
 
 ## File Structure
 ```
@@ -192,6 +237,32 @@ Each team member contributed specific functionality:
 2. **ID System**: Unique identifiers for reliable student record management
 3. **Input Validation**: Multiple layers of validation for robust error handling
 4. **Modular Design**: Separate functions for different operations enhance maintainability
+
+### User Experience Improvements Implemented
+
+Based on the team's analysis and feedback, several key improvements were made to enhance user experience:
+
+#### Kelvin's UX Contributions:
+- **Limit Management**: Implemented smart handling when 10-student limit is reached
+- **Menu Dynamics**: Created context-aware menu that only shows relevant options
+- **Name Validation**: Ensured numbers are rejected in names while allowing proper letter combinations
+- **Status Display**: Added real-time display of student count and remaining capacity
+
+#### Dharambir's Input Enhancements:
+- **Batch Processing**: Added ability to specify number of students to add in one session
+- **Grade Editing**: Implemented persistent validation loops for grade corrections
+- **Range Validation**: Enhanced grade validation with specific error messaging
+
+#### Uzoma's System Improvements:
+- **Delete Protection**: Ensured delete option only appears when students exist
+- **Error Recovery**: Implemented comprehensive error handling that doesn't crash the system
+- **Session Management**: Created smooth workflow that maintains user context
+
+#### Key UX Philosophy:
+- **No Dead Ends**: Users never get stuck or forced to restart
+- **Clear Feedback**: Every action provides immediate, specific feedback
+- **Intelligent Adaptation**: System adapts interface based on current state
+- **Error Tolerance**: Mistakes are handled gracefully with retry opportunities
 
 ## Testing Scenarios
 
