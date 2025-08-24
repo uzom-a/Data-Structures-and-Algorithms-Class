@@ -63,9 +63,6 @@ def add_student():
 
 # Kelvin
 def display_students():
-    if not names:
-        print("No student records to display.")
-        return
     print("\n{:<5} {:<15} {:<7} {:<18}".format("ID", "Name", "Grade", "Category"))
     print("-" * 45)
     for i in range(len(names)):
@@ -85,7 +82,7 @@ def average_grade():
     return sum(grades) / len(grades) if grades else 0
 
 
-# Dharambir  
+# Dharambir
 def max_grade():
     return max(grades) if grades else 0
 
@@ -100,7 +97,7 @@ def delete_student():
     if not names:
         print("No students to delete.")
         return
-    
+
     # Display current students for reference
     print("\nCurrent Students:")
     print("{:<5} {:<15}".format("ID", "Name"))
@@ -108,7 +105,7 @@ def delete_student():
     for i in range(len(names)):
         print("{:<5} {:<15}".format(student_ids[i], names[i]))
     print("-" * 20)
-    
+
     # Persistent validation for student ID
     while True:
         try:
@@ -123,7 +120,9 @@ def delete_student():
                 print("Student deleted successfully.\n")
                 break
             else:
-                print("Student ID not found. Please enter a valid ID from the list above.")
+                print(
+                    "Student ID not found. Please enter a valid ID from the list above."
+                )
         except ValueError:
             print("Invalid input. ID must be an integer. Please try again.")
 
@@ -150,14 +149,18 @@ def main():
             if len(names) >= 10:
                 print("Cannot add more students. Limit of 10 reached.")
             else:
-                a = input(f"How many student(s) you want to add between 1 and {10 - len(names)}: ")
+                a = input(
+                    f"How many student(s) you want to add between 1 and {10 - len(names)}: "
+                )
                 try:
                     num_students = int(a)
                     if 1 <= num_students <= (10 - len(names)):
                         for _ in range(num_students):
                             add_student()
                     else:
-                        print(f"Invalid number. Please enter a number between 1 and {10 - len(names)}.")
+                        print(
+                            f"Invalid number. Please enter a number between 1 and {10 - len(names)}."
+                        )
                 except ValueError:
                     print("Invalid input. Please enter a valid number.")
         elif choice == "2":
