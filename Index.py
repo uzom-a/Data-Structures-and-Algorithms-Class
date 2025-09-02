@@ -28,17 +28,48 @@ def categorize_grade(marks):
 def validate_grade(grade):
     return 0 <= grade <= 100
 
+# Dharambir
+
+def input_name():
+    while True:
+        name = input("Enter the student's name: ").strip()
+
+        # Check if name is empty after stripping spaces
+        if not name:
+            print("Name cannot be empty or only spaces.")
+            continue
+
+        # Check if name is made up of only digits
+        if name.replace(" ", "").isdigit():
+            print("Name cannot be numbers only.")
+            continue
+
+        # Check if all characters are letters, digits, or spaces
+        valid = True
+        for char in name:
+            if not (char.isalnum() or char.isspace()):
+                valid = False
+                break
+
+        if valid:
+            break
+        else:
+            print("Invalid name. Only letters, numbers, and spaces are allowed.")
+    return name
+
+
 
 # Uzoma
 def add_student():
     global global_id
     # validating the name
-    while True:
-        name = input("Enter the student's name: ").strip()
-        if all(part.isalpha() for part in name.split()):
-            break
-        else:
-            print("Invalid input. Name must contain only letters and spaces")
+    name = input_name()
+    # while True:
+    #     name = input("Enter the student's name: ").strip()
+    #     if all(part.isalpha() for part in name.split()):
+    #         break
+    #     else:
+    #         print("Invalid input. Name must contain only letters and spaces")
     # validating the grade
     while True:
         try:
