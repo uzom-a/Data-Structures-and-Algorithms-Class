@@ -39,23 +39,31 @@ Edge cases
 #     item_price = int(input("Enter the product's price: "))
 
 
+def validate_price():
+    pass
+
+
 def calculate_tax(item_price):
     tax_rate = 10.44 / 100
     return item_price * tax_rate + item_price
 
 
+# Agrawal
 def display_receipt():
     pass
 
 
+# Kelvin
 def calculte_budget():
     pass
 
 
+# Kelvin
 def display_cart():
     pass
 
 
+# Agrawal
 def check_out():
     pass
 
@@ -74,5 +82,5 @@ def add_product():
             print("Invalid input. Item_Price must be an integer")
 
 
-def validate_price():
-    pass
+# def validate_price():
+#     pass
