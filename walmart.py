@@ -12,14 +12,19 @@ def add_product():
     item_name = input("Enter the product's name: ").strip()
 
     while True:
-            if digit:
-                print("Invalid input. Letter cannot be a price")
-            else:
-                 pass
-
-    item_price = int(input("Enter the product's price: "))
-
+            try:
+                item_price = int(input("Enter the product's price: "))
+                if not validate_price(item_price):
+                    print("Invalid input. Item_Price should not be a negative number")
+                else:
+                     break
+            except ValueError:
+                print("Invalid input. Item_Price must be an integer")
+       
 
 def calculate_tax(item_price):
     tax_rate = 10.44 / 100
     return item_price * tax_rate + item_price
+
+def validate_price():
+    pass
