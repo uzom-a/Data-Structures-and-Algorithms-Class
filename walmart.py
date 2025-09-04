@@ -7,3 +7,7 @@ account for
 tax, and display a receipt upon checkout.
 
 """
+
+def add_product():
+    item_name = input("Enter the product's name: ").strip()
+    item_price = int(input("Enter the product's price: "))
