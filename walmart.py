@@ -32,15 +32,15 @@ Edge cases
 5. product names cannot only be numbers
 
 """
+items = []
+prices = []
 
 
-# def add_product():
-#     item_name = input("Enter the product's name: ").strip()
-#     item_price = int(input("Enter the product's price: "))
-
-
-def validate_price():
-    pass
+#Uzoma
+def validate_price(item_price):
+    if item_price < 0:
+        return False
+    return True
 
 
 def calculate_tax(item_price):
@@ -67,7 +67,7 @@ def display_cart():
 def check_out():
     pass
 
-
+#Uzoma
 def add_product():
     item_name = input("Enter the product's name: ").strip()
 
@@ -81,6 +81,22 @@ def add_product():
         except ValueError:
             print("Invalid input. Item_Price must be an integer")
 
+    items.append(item_name)
+    prices.append(item_price)
+    print(f"{item_name} and {item_price} added successfully")
 
-# def validate_price():
-#     pass
+def main():
+    print("------------------------------------")
+    print("Welcome to Walmart!")
+    print("------------------------------------")
+
+    while True:
+         print(f"\n{len(items)} items added")
+         print(f"There are {(10 - len(items))} more item(s) to add")
+         print("Select an option:")
+         print("1 - Add Item")
+         break
+        
+
+if __name__ == "__main__":
+    main()
