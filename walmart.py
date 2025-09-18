@@ -1,6 +1,5 @@
 items = []
 prices = []
-BUDGET = 100.0
 TAX_RATE = 10.44 / 100
 
 
@@ -44,11 +43,6 @@ def get_total_with_tax():
     return total_before_tax + total_tax
 
 
-def get_remaining_budget():
-    """Calculate remaining budget after tax"""
-    return BUDGET - get_total_with_tax()
-
-
 # Agrawal - Receipt display and checkout process
 def display_receipt():
     """Display detailed receipt with all items and totals"""
@@ -73,18 +67,9 @@ def display_receipt():
     print(f"Subtotal (before tax): ${total_before_tax:.2f}")
     print(f"Tax (10.44%): ${total_tax:.2f}")
     print(f"Total (after tax): ${total_after_tax:.2f}")
-    print(f"Remaining budget: ${BUDGET - total_after_tax:.2f}")
     print("=" * 50)
     print("Thank you for shopping at Walmart!")
     print("=" * 50)
-
-
-# Kelvin - Budget constraint logic
-def can_afford_item(item_price):
-    """Check if user can afford to add an item"""
-    current_total = get_total_with_tax()
-    item_with_tax = item_price + (item_price * TAX_RATE)
-    return (current_total + item_with_tax) <= BUDGET
 
 
 # Kelvin - Cart display
@@ -106,7 +91,6 @@ def display_cart():
     print(f"\nSubtotal: ${total_before_tax:.2f}")
     print(f"Tax: ${total_tax:.2f}")
     print(f"Total with tax: ${total_with_tax:.2f}")
-    print(f"Remaining budget: ${BUDGET - total_with_tax:.2f}")
     print("-" * 20)
 
 
@@ -160,28 +144,28 @@ def add_product():
                 print("Invalid input. Price cannot be negative.")
                 continue
 
-            # Check if item can be afforded
-            if not can_afford_item(item_price):
-                item_with_tax = item_price + (item_price * TAX_RATE)
-                remaining = get_remaining_budget()
-                print(
-                    f"\nSorry! Adding this item (${item_with_tax:.2f} with tax) would exceed your budget."
-                )
-                print(f"You have ${remaining:.2f} remaining to spend.")
-                print(
-                    f"Maximum item price you can afford: ${remaining / (1 + TAX_RATE):.2f}"
-                )
+        #     # Check if item can be afforded
+        #     if not can_afford_item(item_price):
+        #         item_with_tax = item_price + (item_price * TAX_RATE)
+        #         remaining = get_remaining_budget()
+        #         print(
+        #             f"\nSorry! Adding this item (${item_with_tax:.2f} with tax) would exceed your budget."
+        #         )
+        #         print(f"You have ${remaining:.2f} remaining to spend.")
+        #         print(
+        #             f"Maximum item price you can afford: ${remaining / (1 + TAX_RATE):.2f}"
+        #         )
 
-                choice = (
-                    input("Would you like to try a different price? (yes/no): ")
-                    .lower()
-                    .strip()
-                )
-                if choice not in ["yes", "y"]:
-                    return
-                continue
+        #         choice = (
+        #             input("Would you like to try a different price? (yes/no): ")
+        #             .lower()
+        #             .strip()
+        #         )
+        #         if choice not in ["yes", "y"]:
+        #             return
+        #         continue
 
-            break
+            break  
 
         except ValueError:
             print("Invalid input. Price must be a number.")
@@ -192,14 +176,14 @@ def add_product():
     item_with_tax = item_price + (item_price * TAX_RATE)
     print(f"\n✓ {item_name} (${item_price:.2f}) added successfully!")
     print(f"  Price with tax: ${item_with_tax:.2f}")
-    print(f"  Remaining budget: ${get_remaining_budget():.2f}")
+    # print(f"  Remaining budget: ${get_remaining_budget():.2f}")
 
 
 def main():
     """Main program loop"""
     print("=" * 50)
     print("      WELCOME TO WALMART!")
-    print("      Budget: $100.00")
+    # print("      Budget: $100.00")
     print("      Tax Rate: 10.44%")
     print("=" * 50)
 
@@ -207,16 +191,16 @@ def main():
         # Display current status
         if items:
             print(f"\n📦 Cart: {len(items)} item(s)")
-            print(f"💰 Remaining budget: ${get_remaining_budget():.2f}")
+            # print(f"💰 Remaining budget: ${get_remaining_budget():.2f}")
         else:
             print(f"\n📦 Cart is empty")
-            print(f"💰 Full budget available: ${BUDGET:.2f}")
+            # print(f"💰 Full budget available: ${BUDGET:.2f}")
 
         # Check if budget is exhausted
-        remaining = get_remaining_budget()
-        if remaining <= 0:
-            print("\n⚠️  You've reached your budget limit!")
-            print("Please proceed to checkout or remove items.")
+        # remaining = get_remaining_budget()
+        # if remaining <= 0:
+        #     print("\n⚠️  You've reached your budget limit!")
+        #     print("Please proceed to checkout or remove items.")
 
         # Display menu options
         print("\nSelect an option:")
@@ -228,9 +212,9 @@ def main():
         choice = input("\nEnter your choice (1-4): ").strip()
 
         if choice == "1":
-            if remaining <= 0:
-                print("Cannot add items - budget exhausted!")
-                continue
+            # if remaining <= 0:
+            #     print("Cannot add items - budget exhausted!")
+            #     continue
             add_product()
 
         elif choice == "2":
