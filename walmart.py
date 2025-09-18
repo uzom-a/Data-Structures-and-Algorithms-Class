@@ -144,27 +144,6 @@ def add_product():
                 print("Invalid input. Price cannot be negative.")
                 continue
 
-        #     # Check if item can be afforded
-        #     if not can_afford_item(item_price):
-        #         item_with_tax = item_price + (item_price * TAX_RATE)
-        #         remaining = get_remaining_budget()
-        #         print(
-        #             f"\nSorry! Adding this item (${item_with_tax:.2f} with tax) would exceed your budget."
-        #         )
-        #         print(f"You have ${remaining:.2f} remaining to spend.")
-        #         print(
-        #             f"Maximum item price you can afford: ${remaining / (1 + TAX_RATE):.2f}"
-        #         )
-
-        #         choice = (
-        #             input("Would you like to try a different price? (yes/no): ")
-        #             .lower()
-        #             .strip()
-        #         )
-        #         if choice not in ["yes", "y"]:
-        #             return
-        #         continue
-
             break  
 
         except ValueError:
@@ -176,14 +155,13 @@ def add_product():
     item_with_tax = item_price + (item_price * TAX_RATE)
     print(f"\n✓ {item_name} (${item_price:.2f}) added successfully!")
     print(f"  Price with tax: ${item_with_tax:.2f}")
-    # print(f"  Remaining budget: ${get_remaining_budget():.2f}")
+   
 
 
 def main():
     """Main program loop"""
     print("=" * 50)
     print("      WELCOME TO WALMART!")
-    # print("      Budget: $100.00")
     print("      Tax Rate: 10.44%")
     print("=" * 50)
 
@@ -191,17 +169,10 @@ def main():
         # Display current status
         if items:
             print(f"\n📦 Cart: {len(items)} item(s)")
-            # print(f"💰 Remaining budget: ${get_remaining_budget():.2f}")
         else:
             print(f"\n📦 Cart is empty")
-            # print(f"💰 Full budget available: ${BUDGET:.2f}")
 
-        # Check if budget is exhausted
-        # remaining = get_remaining_budget()
-        # if remaining <= 0:
-        #     print("\n⚠️  You've reached your budget limit!")
-        #     print("Please proceed to checkout or remove items.")
-
+        
         # Display menu options
         print("\nSelect an option:")
         print("1 - Add Item")
@@ -212,9 +183,6 @@ def main():
         choice = input("\nEnter your choice (1-4): ").strip()
 
         if choice == "1":
-            # if remaining <= 0:
-            #     print("Cannot add items - budget exhausted!")
-            #     continue
             add_product()
 
         elif choice == "2":
