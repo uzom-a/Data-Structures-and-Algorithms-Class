@@ -61,11 +61,11 @@ def save_transaction(items, prices, transaction_file=TRANSACTIONS_FILE):
     with open(transaction_file, 'a', newline='') as file:
         writer = csv.writer(file)
         
-        # Write header if new file
+        # Write header if new file is needed
         if not file_exists:
             writer.writerow(["timestamp", "items", "subtotal", "tax", "total"])
         
-        # Write transaction data
+        # Write transaction data here
         writer.writerow([timestamp, items_json, subtotal, tax, total])
     
     return {
