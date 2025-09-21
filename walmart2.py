@@ -21,7 +21,6 @@ def is_headless():
 
 
 # Constants
-BUDGET = 100.0
 TAX_RATE = 10.44 / 100
 TRANSACTIONS_FILE = "transactions.csv"
 
@@ -319,16 +318,6 @@ class WalmartApp:
             messagebox.showerror("Input Error", "Price must be a number")
             return
         
-        # Check budget
-        current_total = self.get_total_with_tax()
-        item_with_tax = item_price + (item_price * TAX_RATE)
-        
-        if (current_total + item_with_tax) > BUDGET:
-            remaining = BUDGET - current_total
-            messagebox.showwarning("Budget Exceeded", 
-                                 f"Adding this item (${item_with_tax:.2f} with tax) would exceed your budget.\n"
-                                 f"You have ${remaining:.2f} remaining to spend.")
-            return
         
         # Add to cart
         self.items.append(item_name)
