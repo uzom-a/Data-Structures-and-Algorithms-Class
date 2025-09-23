@@ -1,7 +1,6 @@
 
 items = []
 prices = []
-BUDGET = 100.0
 TAX_RATE = 10.44 / 100
 TRANSACTIONS_FILE = "transactions.csv"
 
