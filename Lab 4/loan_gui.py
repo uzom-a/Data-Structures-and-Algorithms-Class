@@ -46,11 +46,23 @@ class LoanManagementGUI:
     
     def create_widgets(self):
         """Create all GUI widgets"""
-        
-        # Main container
-        main_frame = tk.Frame(self.root, bg="#f5f5f5")
+
+        # Notebook (tabs)
+        notebook = ttk.Notebook(self.root)
+        notebook.pack(fill=tk.BOTH, expand=True, padx=12, pady=12)
+
+        # Calculator tab
+        calc_tab = tk.Frame(notebook, bg="#f5f5f5")
+        notebook.add(calc_tab, text="Calculator")
+
+        # History tab
+        history_tab = tk.Frame(notebook, bg="#f5f5f5")
+        notebook.add(history_tab, text="History")
+
+        # Main container inside calculator tab
+        main_frame = tk.Frame(calc_tab, bg="#f5f5f5")
         main_frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
-        
+
         # Title
         title_label = tk.Label(
             main_frame,
@@ -281,6 +293,74 @@ class LoanManagementGUI:
             command=self.clear_form
         )
         clear_button.pack(pady=(10, 0))
+
+        # --- History tab content ---
+        history_frame = tk.Frame(history_tab, bg="#f0f4f8")
+        history_frame.pack(fill=tk.BOTH, expand=True, padx=12, pady=12)
+
+        hist_label = tk.Label(history_frame, text="Saved Loan Records", font=("Arial", 14, "bold"), bg="#f0f4f8")
+        hist_label.pack(pady=(0,8))
+
+        columns = ("Loan Type", "Loan Amount", "Interest Rate", "Term", "Monthly Payment", "Total Interest", "Status")
+        self.history_tree = ttk.Treeview(history_frame, columns=columns, show='headings', height=12)
+        for col in columns:
+            self.history_tree.heading(col, text=col)
+            self.history_tree.column(col, width=120, anchor='center')
+        self.history_tree.pack(fill=tk.BOTH, expand=True, padx=6, pady=6)
+
+        hist_actions = tk.Frame(history_frame, bg="#f0f4f8")
+        hist_actions.pack(fill=tk.X, pady=(6,0))
+
+        refresh_btn = tk.Button(hist_actions, text="Refresh", command=self.refresh_history, bg="#3498db", fg="white", padx=12, pady=6)
+        refresh_btn.pack(side=tk.LEFT, padx=(0,8))
+
+        export_btn = tk.Button(hist_actions, text="Export CSV", command=self.export_history, bg="#10b981", fg="white", padx=12, pady=6)
+        export_btn.pack(side=tk.LEFT)
+
+        # Load history initially
+        self.refresh_history()
+
+    def refresh_history(self):
+        """Load loan records from loan_records.csv into the Treeview"""
+        # Clear existing rows
+        for row in self.history_tree.get_children():
+            self.history_tree.delete(row)
+
+        try:
+            with open('loan_records.csv', newline='') as csvfile:
+                reader = csv.reader(csvfile)
+                headers = next(reader, None)
+                for r in reader:
+                    # Ensure we have 7 columns; pad if necessary
+                    if len(r) < 7:
+                        r += [''] * (7 - len(r))
+                    self.history_tree.insert('', tk.END, values=tuple(r))
+        except FileNotFoundError:
+            # No file yet - nothing to load
+            return
+
+    def export_history(self):
+        """Export current loan_records.csv to a user-chosen file path (simple save-as)"""
+        try:
+            # Read source file
+            with open('loan_records.csv', 'r', newline='') as src:
+                data = src.read()
+        except FileNotFoundError:
+            messagebox.showwarning('No Records', 'No loan_records.csv file found to export.')
+            return
+
+        # Ask user for destination path using a simple dialog (asksaveasfile not used to avoid imports)
+        from tkinter.filedialog import asksaveasfilename
+        dest = asksaveasfilename(defaultextension='.csv', filetypes=[('CSV files','*.csv')], title='Export Loan Records As')
+        if not dest:
+            return
+
+        try:
+            with open(dest, 'w', newline='') as dst:
+                dst.write(data)
+            messagebox.showinfo('Exported', f'Loan records exported to {dest}')
+        except Exception as e:
+            messagebox.showerror('Export Failed', f'Failed to export: {e}')
     
     def get_loan_info_text(self, loan_type):
         """Get formatted loan type information"""
