@@ -1,886 +1,529 @@
 """
-Modern Bank Loan Management System - GUI Application
-Author: Assistant
-Date: 2024
-
-A professional, responsive GUI for the loan management system featuring:
-- Real-time loan calculations
-- Input validation
-- Professional banking theme
-- CSV integration
-- Affordability warnings
+Bank Loan Management System - GUI Application
+Clean and user-friendly interface for loan calculations
 """
 
 import tkinter as tk
-from tkinter import ttk, messagebox, filedialog
-import threading
-from datetime import datetime
-
-# Import our backend modules
-from input_validation import (
-    validate_loan_amount,
+from tkinter import ttk, messagebox
+import csv
+from loan_logic import (
+    LOAN_TYPES,
+    validate_loan_amount, 
     validate_term,
     validate_income,
-    validate_loan_type,
-    LOAN_CONFIGS,
-)
-from loan_calculator import (
     calculate_monthly_payment,
     calculate_total_interest,
     check_affordability,
-    calculate_loan_summary,
+    calculate_loan_eligibility,
+    format_currency
 )
-from loan_summary import save_loan_record
-from utils import format_currency, format_percentage, print_status_message
 
 
 class LoanManagementGUI:
     def __init__(self, root):
         self.root = root
-        self.setup_window()
-        self.setup_variables()
-        self.setup_styles()
-        self.create_widgets()
-        self.setup_bindings()
-
-    def setup_window(self):
-        """Configure the main window"""
-        self.root.title("🏦 Bank Loan Management System")
-        self.root.geometry("800x700")
-        self.root.minsize(700, 600)
+        self.root.title("Bank Loan Management System")
+        self.root.geometry("700x750")
         self.root.configure(bg="#f0f4f8")
-
-        # Center the window
+        
+        # Center window on screen
+        self.center_window()
+        
+        # Create UI components
+        self.create_widgets()
+        
+        # Store last calculation data
+        self.last_calculation = None
+    
+    def center_window(self):
+        """Center the window on the screen"""
         self.root.update_idletasks()
-        x = (self.root.winfo_screenwidth() // 2) - (800 // 2)
-        y = (self.root.winfo_screenheight() // 2) - (700 // 2)
-        self.root.geometry(f"800x700+{x}+{y}")
-
-    def setup_variables(self):
-        """Initialize tkinter variables"""
-        self.loan_type_var = tk.StringVar(value="Housing")
-        self.loan_amount_var = tk.StringVar()
-        self.term_years_var = tk.StringVar()
-        self.monthly_income_var = tk.StringVar()
-
-        # Calculation results
-        self.monthly_payment_var = tk.StringVar(value="$0.00")
-        self.total_interest_var = tk.StringVar(value="$0.00")
-        self.total_amount_var = tk.StringVar(value="$0.00")
-        self.debt_ratio_var = tk.StringVar(value="0.0%")
-        self.status_var = tk.StringVar(value="Ready to calculate")
-
-        # Warning status
-        self.warning_text = tk.StringVar(value="")
-        self.warning_color = "#28a745"  # Green for no warnings
-
-    def setup_styles(self):
-        """Configure custom styles"""
-        style = ttk.Style()
-
-        # Configure theme colors
-        style.configure(
-            "Title.TLabel",
-            font=("Arial", 16, "bold"),
-            foreground="#1e3a8a",
-            background="#f0f4f8",
-        )
-
-        style.configure(
-            "Header.TLabel",
-            font=("Arial", 12, "bold"),
-            foreground="#374151",
-            background="#f0f4f8",
-        )
-
-        style.configure(
-            "Result.TLabel",
-            font=("Arial", 11, "bold"),
-            foreground="#1f2937",
-            background="#f0f4f8",
-        )
-
-        style.configure(
-            "Warning.TLabel",
-            font=("Arial", 10),
-            foreground="#dc2626",
-            background="#f0f4f8",
-        )
-
-        style.configure(
-            "Success.TLabel",
-            font=("Arial", 10),
-            foreground="#059669",
-            background="#f0f4f8",
-        )
-
-        # Button styles
-        style.configure(
-            "Calculate.TButton",
-            font=("Arial", 11, "bold"),
-            background="#3b82f6",
-            foreground="white",
-        )
-
-        style.configure(
-            "Save.TButton",
-            font=("Arial", 11, "bold"),
-            background="#059669",
-            foreground="white",
-        )
-
-        style.configure(
-            "Clear.TButton",
-            font=("Arial", 11),
-            background="#6b7280",
-            foreground="white",
-        )
-
-        # Frame styles
-        style.configure(
-            "Card.TFrame", background="white", relief="raised", borderwidth=1
-        )
-
+        width = 650
+        height = 700
+        x = (self.root.winfo_screenwidth() // 2) - (width // 2)
+        y = (self.root.winfo_screenheight() // 2) - (height // 2)
+        self.root.geometry(f'{width}x{height}+{x}+{y}')
+    
     def create_widgets(self):
-        """Create and layout all GUI widgets"""
+        """Create all GUI widgets"""
+        
         # Main container
-        main_container = tk.Frame(self.root, bg="#f0f4f8")
-        main_container.pack(fill="both", expand=True, padx=20, pady=20)
-
+        main_frame = tk.Frame(self.root, bg="#f5f5f5")
+        main_frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
+        
         # Title
-        title_frame = tk.Frame(main_container, bg="#f0f4f8")
-        title_frame.pack(fill="x", pady=(0, 20))
-
-        title_label = ttk.Label(
-            title_frame, text="🏦 Bank Loan Management System", style="Title.TLabel"
+        title_label = tk.Label(
+            main_frame,
+            text="🏦 Bank Loan Calculator",
+            font=("Arial", 24, "bold"),
+            bg="#f5f5f5",
+            fg="#2c3e50"
         )
-        title_label.pack()
-
-        subtitle_label = ttk.Label(
-            title_frame,
-            text="Professional Loan Calculator & Application System",
-            font=("Arial", 10),
-            foreground="#6b7280",
-            background="#f0f4f8",
+        title_label.pack(pady=(0, 20))
+        
+        # Input Frame
+        input_frame = tk.LabelFrame(
+            main_frame,
+            text="  Loan Information  ",
+            font=("Arial", 12, "bold"),
+            bg="white",
+            fg="#34495e",
+            padx=20,
+            pady=15
         )
-        subtitle_label.pack(pady=(5, 0))
-
-        # Create main content area with notebook for tabs
-        self.notebook = ttk.Notebook(main_container)
-        self.notebook.pack(fill="both", expand=True)
-
-        # Loan Calculator Tab
-        self.create_loan_calculator_tab()
-
-        # Loan Records Tab
-        self.create_loan_records_tab()
-
-        # Help Tab
-        self.create_help_tab()
-
-    def create_loan_calculator_tab(self):
-        """Create the main loan calculator interface"""
-        calculator_frame = ttk.Frame(self.notebook)
-        self.notebook.add(calculator_frame, text="📊 Loan Calculator")
-
-        # Left panel - Input form
-        left_panel = tk.Frame(calculator_frame, bg="white", relief="raised", bd=1)
-        left_panel.pack(side="left", fill="both", expand=True, padx=(10, 5), pady=10)
-
-        # Input form title
-        input_title = ttk.Label(
-            left_panel, text="Loan Application Details", style="Header.TLabel"
-        )
-        input_title.pack(pady=(15, 10))
-
-        # Create input form
-        self.create_input_form(left_panel)
-
-        # Right panel - Results
-        right_panel = tk.Frame(calculator_frame, bg="white", relief="raised", bd=1)
-        right_panel.pack(side="right", fill="both", expand=True, padx=(5, 10), pady=10)
-
-        # Results title
-        results_title = ttk.Label(
-            right_panel, text="Loan Calculation Results", style="Header.TLabel"
-        )
-        results_title.pack(pady=(15, 10))
-
-        # Create results display
-        self.create_results_display(right_panel)
-
-        # Bottom panel - Actions
-        self.create_action_buttons(calculator_frame)
-
-    def create_input_form(self, parent):
-        """Create the loan input form"""
-        form_frame = tk.Frame(parent, bg="white")
-        form_frame.pack(fill="x", padx=20, pady=10)
-
-        # Loan Type Selection
-        loan_type_frame = tk.Frame(form_frame, bg="white")
-        loan_type_frame.pack(fill="x", pady=5)
-
-        ttk.Label(
-            loan_type_frame,
+        input_frame.pack(fill=tk.BOTH, pady=(0, 15))
+        
+        # Loan Type
+        tk.Label(
+            input_frame,
             text="Loan Type:",
-            font=("Arial", 10, "bold"),
-            background="white",
-        ).pack(anchor="w")
-
+            font=("Arial", 11),
+            bg="white"
+        ).grid(row=0, column=0, sticky="w", pady=8)
+        
+        self.loan_type_var = tk.StringVar(value="Housing")
         loan_type_combo = ttk.Combobox(
-            loan_type_frame,
+            input_frame,
             textvariable=self.loan_type_var,
-            values=["Housing", "Auto", "Personal"],
+            values=list(LOAN_TYPES.keys()),
             state="readonly",
-            font=("Arial", 10),
-            width=25,
+            font=("Arial", 11),
+            width=28
         )
-        loan_type_combo.pack(fill="x", pady=(2, 0))
-
-        # Loan Amount
-        amount_frame = tk.Frame(form_frame, bg="white")
-        amount_frame.pack(fill="x", pady=5)
-
-        ttk.Label(
-            amount_frame,
-            text="Loan Amount ($):",
-            font=("Arial", 10, "bold"),
-            background="white",
-        ).pack(anchor="w")
-
-        amount_entry = tk.Entry(
-            amount_frame,
-            textvariable=self.loan_amount_var,
-            font=("Arial", 10),
-            width=27,
-        )
-        amount_entry.pack(fill="x", pady=(2, 0))
-
-        # Term Years
-        term_frame = tk.Frame(form_frame, bg="white")
-        term_frame.pack(fill="x", pady=5)
-
-        ttk.Label(
-            term_frame,
-            text="Loan Term (Years):",
-            font=("Arial", 10, "bold"),
-            background="white",
-        ).pack(anchor="w")
-
-        term_entry = tk.Entry(
-            term_frame, textvariable=self.term_years_var, font=("Arial", 10), width=27
-        )
-        term_entry.pack(fill="x", pady=(2, 0))
-
-        # Monthly Income
-        income_frame = tk.Frame(form_frame, bg="white")
-        income_frame.pack(fill="x", pady=5)
-
-        ttk.Label(
-            income_frame,
-            text="Monthly Income ($):",
-            font=("Arial", 10, "bold"),
-            background="white",
-        ).pack(anchor="w")
-
-        income_entry = tk.Entry(
-            income_frame,
-            textvariable=self.monthly_income_var,
-            font=("Arial", 10),
-            width=27,
-        )
-        income_entry.pack(fill="x", pady=(2, 0))
-
-        # Term limits info
-        self.term_info_label = ttk.Label(
-            form_frame,
-            text="",
+        loan_type_combo.grid(row=0, column=1, pady=8, sticky="ew")
+        loan_type_combo.bind("<<ComboboxSelected>>", self.update_loan_info)
+        
+        # Loan info label (shows rate and max term)
+        self.loan_info_label = tk.Label(
+            input_frame,
+            text=self.get_loan_info_text("Housing"),
             font=("Arial", 9),
-            foreground="#6b7280",
-            background="white",
+            bg="white",
+            fg="#7f8c8d"
         )
-        self.term_info_label.pack(anchor="w", pady=(5, 0))
-
-    def create_results_display(self, parent):
-        """Create the loan calculation results display"""
-        results_frame = tk.Frame(parent, bg="white")
-        results_frame.pack(fill="both", expand=True, padx=20, pady=10)
-
+        self.loan_info_label.grid(row=1, column=1, sticky="w", pady=(0, 8))
+        
+        # Loan Amount
+        tk.Label(
+            input_frame,
+            text="Loan Amount ($):",
+            font=("Arial", 11),
+            bg="white"
+        ).grid(row=2, column=0, sticky="w", pady=8)
+        
+        self.loan_amount_var = tk.StringVar()
+        tk.Entry(
+            input_frame,
+            textvariable=self.loan_amount_var,
+            font=("Arial", 11),
+            width=30
+        ).grid(row=2, column=1, pady=8, sticky="ew")
+        
+        # Loan Term
+        tk.Label(
+            input_frame,
+            text="Loan Term (Years):",
+            font=("Arial", 11),
+            bg="white"
+        ).grid(row=3, column=0, sticky="w", pady=8)
+        
+        self.term_var = tk.StringVar()
+        tk.Entry(
+            input_frame,
+            textvariable=self.term_var,
+            font=("Arial", 11),
+            width=30
+        ).grid(row=3, column=1, pady=8, sticky="ew")
+        
+        # Monthly Income
+        tk.Label(
+            input_frame,
+            text="Monthly Income ($):",
+            font=("Arial", 11),
+            bg="white"
+        ).grid(row=4, column=0, sticky="w", pady=8)
+        
+        self.income_var = tk.StringVar()
+        tk.Entry(
+            input_frame,
+            textvariable=self.income_var,
+            font=("Arial", 11),
+            width=30
+        ).grid(row=4, column=1, pady=8, sticky="ew")
+        
+        input_frame.columnconfigure(1, weight=1)
+        
+        # Calculate Button
+        calc_button = tk.Button(
+            main_frame,
+            text="Calculate Loan",
+            font=("Arial", 12, "bold"),
+            bg="#3498db",
+            fg="white",
+            padx=30,
+            pady=12,
+            cursor="hand2",
+            relief=tk.FLAT,
+            command=self.calculate_loan
+        )
+        calc_button.pack(pady=10)
+        
+        # Results Frame
+        results_frame = tk.LabelFrame(
+            main_frame,
+            text="  Calculation Results  ",
+            font=("Arial", 12, "bold"),
+            bg="white",
+            fg="#34495e",
+            padx=20,
+            pady=15
+        )
+        results_frame.pack(fill=tk.BOTH, expand=True)
+        
         # Monthly Payment
-        payment_frame = tk.Frame(results_frame, bg="white")
-        payment_frame.pack(fill="x", pady=5)
-
-        ttk.Label(
-            payment_frame,
-            text="Monthly Payment:",
-            font=("Arial", 10, "bold"),
-            background="white",
-        ).pack(anchor="w")
-
-        payment_result = ttk.Label(
-            payment_frame, textvariable=self.monthly_payment_var, style="Result.TLabel"
-        )
-        payment_result.pack(anchor="w", pady=(2, 0))
-
-        # Total Interest
-        interest_frame = tk.Frame(results_frame, bg="white")
-        interest_frame.pack(fill="x", pady=5)
-
-        ttk.Label(
-            interest_frame,
-            text="Total Interest:",
-            font=("Arial", 10, "bold"),
-            background="white",
-        ).pack(anchor="w")
-
-        interest_result = ttk.Label(
-            interest_frame, textvariable=self.total_interest_var, style="Result.TLabel"
-        )
-        interest_result.pack(anchor="w", pady=(2, 0))
-
-        # Total Amount
-        total_frame = tk.Frame(results_frame, bg="white")
-        total_frame.pack(fill="x", pady=5)
-
-        ttk.Label(
-            total_frame,
-            text="Total Amount:",
-            font=("Arial", 10, "bold"),
-            background="white",
-        ).pack(anchor="w")
-
-        total_result = ttk.Label(
-            total_frame, textvariable=self.total_amount_var, style="Result.TLabel"
-        )
-        total_result.pack(anchor="w", pady=(2, 0))
-
-        # Debt Ratio
-        ratio_frame = tk.Frame(results_frame, bg="white")
-        ratio_frame.pack(fill="x", pady=5)
-
-        ttk.Label(
-            ratio_frame,
-            text="Debt-to-Income Ratio:",
-            font=("Arial", 10, "bold"),
-            background="white",
-        ).pack(anchor="w")
-
-        self.ratio_result = ttk.Label(
-            ratio_frame, textvariable=self.debt_ratio_var, style="Result.TLabel"
-        )
-        self.ratio_result.pack(anchor="w", pady=(2, 0))
-
-        # Status
-        status_frame = tk.Frame(results_frame, bg="white")
-        status_frame.pack(fill="x", pady=(10, 0))
-
-        ttk.Label(
-            status_frame, text="Status:", font=("Arial", 10, "bold"), background="white"
-        ).pack(anchor="w")
-
-        self.status_result = ttk.Label(
-            status_frame, textvariable=self.status_var, style="Result.TLabel"
-        )
-        self.status_result.pack(anchor="w", pady=(2, 0))
-
-        # Warning message
-        self.warning_label = ttk.Label(
+        tk.Label(
             results_frame,
-            textvariable=self.warning_text,
-            font=("Arial", 10),
-            background="white",
-        )
-        self.warning_label.pack(anchor="w", pady=(10, 0))
-
-    def create_action_buttons(self, parent):
-        """Create action buttons"""
-        button_frame = tk.Frame(parent, bg="#f0f4f8")
-        button_frame.pack(fill="x", pady=10)
-
-        # Calculate button
-        calc_btn = tk.Button(
-            button_frame,
-            text="🔄 Calculate Loan",
-            command=self.calculate_loan,
+            text="Monthly Payment:",
             font=("Arial", 11, "bold"),
-            bg="#3b82f6",
-            fg="white",
-            relief="flat",
-            padx=20,
-            pady=8,
-            cursor="hand2",
+            bg="white"
+        ).grid(row=0, column=0, sticky="w", pady=8)
+        
+        self.monthly_payment_label = tk.Label(
+            results_frame,
+            text="$0.00",
+            font=("Arial", 11),
+            bg="white",
+            fg="#27ae60"
         )
-        calc_btn.pack(side="left", padx=5)
-
-        # Save button - will be updated based on approval status
-        self.save_btn = tk.Button(
-            button_frame,
-            text="💾 Save Loan Record",
-            command=self.save_loan,
+        self.monthly_payment_label.grid(row=0, column=1, sticky="e", pady=8)
+        
+        # Total Interest
+        tk.Label(
+            results_frame,
+            text="Total Interest:",
             font=("Arial", 11, "bold"),
-            bg="#059669",
-            fg="white",
-            relief="flat",
-            padx=20,
-            pady=8,
-            cursor="hand2",
-        )
-        self.save_btn.pack(side="left", padx=5)
-
-        # Clear button
-        clear_btn = tk.Button(
-            button_frame,
-            text="🗑️ Clear Form",
-            command=self.clear_form,
+            bg="white"
+        ).grid(row=1, column=0, sticky="w", pady=8)
+        
+        self.total_interest_label = tk.Label(
+            results_frame,
+            text="$0.00",
             font=("Arial", 11),
-            bg="#6b7280",
-            fg="white",
-            relief="flat",
-            padx=20,
-            pady=8,
-            cursor="hand2",
+            bg="white",
+            fg="#e74c3c"
         )
-        clear_btn.pack(side="left", padx=5)
-
-    def create_loan_records_tab(self):
-        """Create tab for viewing loan records"""
-        records_frame = ttk.Frame(self.notebook)
-        self.notebook.add(records_frame, text="📋 Loan Records")
-
-        # Title
-        title_label = ttk.Label(
-            records_frame, text="Loan Records Management", style="Header.TLabel"
-        )
-        title_label.pack(pady=20)
-
-        # Records display area
-        records_display = tk.Frame(records_frame, bg="white", relief="raised", bd=1)
-        records_display.pack(fill="both", expand=True, padx=20, pady=10)
-
-        # Scrollable text widget for records
-        self.records_text = tk.Text(
-            records_display, font=("Courier", 10), bg="white", fg="#374151", wrap="none"
-        )
-
-        scrollbar = ttk.Scrollbar(
-            records_display, orient="vertical", command=self.records_text.yview
-        )
-        self.records_text.configure(yscrollcommand=scrollbar.set)
-
-        self.records_text.pack(side="left", fill="both", expand=True, padx=10, pady=10)
-        scrollbar.pack(side="right", fill="y", pady=10)
-
-        # Load records button
-        load_btn = tk.Button(
-            records_frame,
-            text="📂 Load Records",
-            command=self.load_loan_records,
+        self.total_interest_label.grid(row=1, column=1, sticky="e", pady=8)
+        
+        # Total Amount
+        tk.Label(
+            results_frame,
+            text="Total Amount to Pay:",
+            font=("Arial", 11, "bold"),
+            bg="white"
+        ).grid(row=2, column=0, sticky="w", pady=8)
+        
+        self.total_amount_label = tk.Label(
+            results_frame,
+            text="$0.00",
             font=("Arial", 11),
-            bg="#3b82f6",
-            fg="white",
-            relief="flat",
-            padx=20,
-            pady=8,
-            cursor="hand2",
+            bg="white",
+            fg="#34495e"
         )
-        load_btn.pack(pady=10)
-
-    def create_help_tab(self):
-        """Create help and information tab"""
-        help_frame = ttk.Frame(self.notebook)
-        self.notebook.add(help_frame, text="❓ Help")
-
-        # Help content
-        help_text = tk.Text(
-            help_frame,
+        self.total_amount_label.grid(row=2, column=1, sticky="e", pady=8)
+        
+        # Payment to Income Ratio
+        tk.Label(
+            results_frame,
+            text="Payment-to-Income:",
+            font=("Arial", 11, "bold"),
+            bg="white"
+        ).grid(row=3, column=0, sticky="w", pady=8)
+        
+        self.debt_ratio_label = tk.Label(
+            results_frame,
+            text="0.00%",
+            font=("Arial", 11),
+            bg="white",
+            fg="#34495e"
+        )
+        self.debt_ratio_label.grid(row=3, column=1, sticky="e", pady=8)
+        
+        # Separator
+        ttk.Separator(results_frame, orient='horizontal').grid(
+            row=4, column=0, columnspan=2, sticky="ew", pady=10
+        )
+        
+        # Status Message
+        self.status_label = tk.Label(
+            results_frame,
+            text="Enter loan details and click Calculate",
             font=("Arial", 10),
             bg="white",
-            fg="#374151",
-            wrap="word",
-            padx=20,
-            pady=20,
+            fg="#7f8c8d",
+            wraplength=550,
+            justify="left"
         )
-        help_text.pack(fill="both", expand=True, padx=20, pady=20)
-
-        help_content = """
-🏦 Bank Loan Management System - Help Guide
-
-LOAN TYPES:
-• Housing Loans: $50,000 - $2,000,000 (5-25 years)
-• Auto Loans: $5,000 - $100,000 (1-6 years)  
-• Personal Loans: $1,000 - $50,000 (1-10 years)
-
-HOW TO USE:
-1. Select your loan type from the dropdown
-2. Enter the loan amount (numbers only)
-3. Enter the loan term in years (within limits shown)
-4. Enter your monthly income
-5. Click "Calculate Loan" to see results
-6. Review the debt-to-income ratio (should be under 50%)
-7. Click "Save Loan Record" to save to CSV file
-
-VALIDATION RULES:
-• All amounts must be positive numbers
-• Loan terms must be within the specified limits
-• Monthly income must be at least $1,500
-• Debt ratio over 50% will show a warning
-
-DEBT-TO-INCOME RATIO:
-This shows what percentage of your income the loan payment represents.
-• Under 30%: Excellent
-• 30-50%: Acceptable
-• Over 50%: Warning - may be difficult to afford
-
-SAVE FEATURES:
-• Records are saved to 'loan_records.csv'
-• Includes all loan details and timestamps
-• Can be opened in Excel or other spreadsheet programs
-
-TROUBLESHOOTING:
-• If calculations don't appear, check that all fields are filled
-• Ensure numbers are entered without currency symbols
-• Make sure loan terms are within the specified limits
-
-For technical support, contact: support@bankloans.com
-        """
-
-        help_text.insert("1.0", help_content)
-        help_text.config(state="disabled")
-
-    def setup_bindings(self):
-        """Set up event bindings for real-time updates"""
-        # Bind loan type changes to update term limits
-        self.loan_type_var.trace("w", self.update_term_limits)
-
-        # Bind all input changes to real-time calculation
-        self.loan_amount_var.trace("w", self.on_input_change)
-        self.term_years_var.trace("w", self.on_input_change)
-        self.monthly_income_var.trace("w", self.on_input_change)
-
-    def update_term_limits(self, *args):
-        """Update term limits when loan type changes"""
+        self.status_label.grid(row=5, column=0, columnspan=2, sticky="w", pady=(5, 0))
+        
+        results_frame.columnconfigure(1, weight=1)
+        
+        # Clear Button
+        clear_button = tk.Button(
+            main_frame,
+            text="Clear Form",
+            font=("Arial", 10),
+            bg="#95a5a6",
+            fg="white",
+            padx=20,
+            pady=8,
+            cursor="hand2",
+            relief=tk.FLAT,
+            command=self.clear_form
+        )
+        clear_button.pack(pady=(10, 0))
+    
+    def get_loan_info_text(self, loan_type):
+        """Get formatted loan type information"""
+        info = LOAN_TYPES[loan_type]
+        return f"Interest Rate: {info['rate']}% | Max Term: {info['max_term']} years"
+    
+    def update_loan_info(self, event=None):
+        """Update loan information when type changes"""
         loan_type = self.loan_type_var.get()
-        if loan_type in LOAN_CONFIGS:
-            config = LOAN_CONFIGS[loan_type]
-            self.term_info_label.config(
-                text=f"Term limits: {config['min_term']}-{config['max_term']} years"
-            )
-        else:
-            self.term_info_label.config(text="")
-
-    def on_input_change(self, *args):
-        """Handle real-time input changes"""
-        # Use threading to prevent GUI freezing during calculations
-        threading.Thread(target=self.calculate_loan, daemon=True).start()
-
-    def validate_inputs(self):
-        """Validate all input fields"""
-        errors = []
-
-        # Check if fields are empty first
-        if not self.loan_amount_var.get().strip():
-            return (
-                errors  # Don't show errors for empty fields during real-time validation
-            )
-
-        if not self.term_years_var.get().strip():
-            return errors
-
-        if not self.monthly_income_var.get().strip():
-            return errors
-
-        # Validate loan amount
-        try:
-            amount = float(self.loan_amount_var.get().replace(",", "").replace("$", ""))
-            loan_type = self.loan_type_var.get()
-            if not validate_loan_amount(amount, loan_type):
-                config = LOAN_CONFIGS.get(loan_type, {})
-                min_amount = config.get("min_amount", 0)
-                max_amount = config.get("max_amount", float("inf"))
-                errors.append(
-                    f"Loan amount must be between ${min_amount:,.0f} and ${max_amount:,.0f}"
-                )
-        except (ValueError, TypeError):
-            errors.append("Please enter a valid loan amount")
-
-        # Validate term
-        try:
-            term = float(self.term_years_var.get())
-            loan_type = self.loan_type_var.get()
-            if not validate_term(term, loan_type):
-                config = LOAN_CONFIGS.get(loan_type, {})
-                min_term = config.get("min_term", 0)
-                max_term = config.get("max_term", 0)
-                errors.append(f"Term must be between {min_term} and {max_term} years")
-        except (ValueError, TypeError):
-            errors.append("Please enter a valid loan term")
-
-        # Validate income
-        try:
-            income = float(
-                self.monthly_income_var.get().replace(",", "").replace("$", "")
-            )
-            if not validate_income(income):
-                errors.append("Monthly income must be at least $1,500")
-        except (ValueError, TypeError):
-            errors.append("Please enter a valid monthly income")
-
-        return errors
-
+        self.loan_info_label.config(text=self.get_loan_info_text(loan_type))
+    
     def calculate_loan(self):
-        """Calculate loan details and update display"""
+        """Main calculation logic"""
         try:
-            # Check if all fields are filled before attempting calculations
-            if (
-                not self.loan_amount_var.get().strip()
-                or not self.term_years_var.get().strip()
-                or not self.monthly_income_var.get().strip()
-            ):
-                # Reset display for empty fields
-                self.monthly_payment_var.set("$0.00")
-                self.total_interest_var.set("$0.00")
-                self.total_amount_var.set("$0.00")
-                self.debt_ratio_var.set("0.0%")
-                self.status_var.set("Ready to calculate")
-                self.warning_text.set("")
-                self.warning_label.config(foreground="#1f2937")
-                self.update_save_button(False)  # Disable save button for empty fields
-                return
-
-            # Validate inputs first
-            errors = self.validate_inputs()
-            if errors:
-                self.status_var.set("❌ Input validation failed")
-                self.warning_text.set("; ".join(errors))
-                self.warning_label.config(foreground="#dc2626")
-                self.update_save_button(
-                    False
-                )  # Disable save button for validation errors
-                return
-
-            # Get input values - safe to convert now since we checked for empty fields
+            # Get inputs
             loan_type = self.loan_type_var.get()
-            principal = float(
-                self.loan_amount_var.get().replace(",", "").replace("$", "")
-            )
-            term_years = float(self.term_years_var.get())
-            monthly_income = float(
-                self.monthly_income_var.get().replace(",", "").replace("$", "")
-            )
-
-            # Calculate loan details using our backend
-            annual_rate = 4.5  # Default rate - in real system this would be calculated
-
-            monthly_payment = calculate_monthly_payment(
-                principal, annual_rate, term_years
-            )
-            total_interest = calculate_total_interest(
-                monthly_payment, principal, term_years
-            )
-            total_amount = principal + total_interest
-
-            # Calculate debt ratio
-            debt_ratio = (monthly_payment / monthly_income) * 100
-
+            loan_amount_str = self.loan_amount_var.get().strip()
+            term_str = self.term_var.get().strip()
+            income_str = self.income_var.get().strip()
+            
+            # Validate loan amount
+            is_valid, error = validate_loan_amount(loan_amount_str)
+            if not is_valid:
+                messagebox.showerror("Invalid Input", f"Loan Amount: {error}")
+                return
+            
+            # Validate term
+            is_valid, error = validate_term(term_str, loan_type)
+            if not is_valid:
+                messagebox.showerror("Invalid Input", f"Loan Term: {error}")
+                return
+            
+            # Validate income
+            is_valid, error = validate_income(income_str)
+            if not is_valid:
+                messagebox.showerror("Invalid Input", f"Monthly Income: {error}")
+                return
+            
+            # Convert to numbers
+            loan_amount = float(loan_amount_str)
+            term_years = int(term_str)
+            monthly_income = float(income_str)
+            interest_rate = LOAN_TYPES[loan_type]["rate"]
+            
+            # Calculate monthly payment and total interest
+            monthly_payment = calculate_monthly_payment(loan_amount, interest_rate, term_years)
+            total_interest = calculate_total_interest(monthly_payment, loan_amount, term_years)
+            total_amount = loan_amount + total_interest
+            affordability = check_affordability(monthly_payment, monthly_income)
+            eligibility = calculate_loan_eligibility(loan_amount, monthly_income)
+            
             # Update display
-            self.monthly_payment_var.set(format_currency(monthly_payment))
-            self.total_interest_var.set(format_currency(total_interest))
-            self.total_amount_var.set(format_currency(total_amount))
-            self.debt_ratio_var.set(f"{debt_ratio:.1f}%")
-
-            # Check affordability and update status
-            affordability = check_affordability(
-                monthly_payment, monthly_income, loan_type
-            )
-
-            if affordability["is_affordable"]:
-                self.status_var.set("✅ Loan Approved")
-                self.status_result.config(foreground="#059669")
-                self.warning_text.set("")
-                self.warning_label.config(foreground="#059669")
-                self.update_save_button(True)  # Enable save button
+            self.monthly_payment_label.config(text=f"${monthly_payment:,.2f}")
+            self.total_interest_label.config(text=f"${total_interest:,.2f}")
+            self.total_amount_label.config(text=f"${total_amount:,.2f}")
+            self.debt_ratio_label.config(text=f"{affordability['payment_ratio']:.2f}%")
+            
+            # Update status message and suggest term adjustment if needed
+            if affordability['is_affordable']:
+                status_text = (
+                    f"✓ APPROVED: This loan is affordable. "
+                    f"Monthly payment is {affordability['payment_ratio']:.1f}% "
+                    f"of your income (maximum 50%)."
+                )
+                status_color = "#059669"  # Green
+                loan_status = "Approved"
             else:
-                self.status_var.set("⚠️ Review Required")
-                self.status_result.config(foreground="#f59e0b")
-                self.warning_text.set(affordability["message"])
-                self.warning_label.config(foreground="#f59e0b")
-                self.update_save_button(False)  # Disable save button
-
-            # Update debt ratio color based on percentage
-            if debt_ratio > 50:
-                self.ratio_result.config(foreground="#dc2626")  # Red
-                self.warning_text.set(
-                    f"⚠️ High debt ratio: {debt_ratio:.1f}% (over 50%)"
-                )
-                self.warning_label.config(foreground="#dc2626")
-            elif debt_ratio > 30:
-                self.ratio_result.config(foreground="#f59e0b")  # Orange
-            else:
-                self.ratio_result.config(foreground="#059669")  # Green
-
-        except Exception as e:
-            self.status_var.set("❌ Calculation Error")
-            self.warning_text.set(f"Error: {str(e)}")
-            self.warning_label.config(foreground="#dc2626")
-            self.update_save_button(False)  # Disable save button for calculation errors
-
-    def save_loan(self):
-        """Save loan record to CSV - only approved loans"""
-        try:
-            # Validate that we have valid calculations
-            if self.monthly_payment_var.get() == "$0.00":
-                messagebox.showwarning(
-                    "No Data", "Please calculate a loan first before saving."
-                )
-                return
-
-            # Check if loan is approved before allowing save
-            current_status = self.status_var.get()
-            if "Approved" not in current_status:
-                messagebox.showwarning(
-                    "Loan Not Approved",
-                    "Only approved loans can be saved to records.\n\n"
-                    "This loan requires review due to:\n"
-                    f"• {self.warning_text.get()}\n\n"
-                    "Please adjust the loan terms to get approval before saving.",
-                )
-                return
-
-            # Prepare loan data
-            loan_data = {
-                "loan_type": self.loan_type_var.get(),
-                "principal": float(
-                    self.loan_amount_var.get().replace(",", "").replace("$", "")
-                ),
-                "annual_rate": 4.5,  # Default rate
-                "term_years": float(self.term_years_var.get()),
-                "monthly_payment": float(
-                    self.monthly_payment_var.get().replace(",", "").replace("$", "")
-                ),
-                "total_interest": float(
-                    self.total_interest_var.get().replace(",", "").replace("$", "")
-                ),
-                "status": "Approved",  # Only approved loans reach this point
-                "monthly_income": float(
-                    self.monthly_income_var.get().replace(",", "").replace("$", "")
-                ),
+                # Calculate a suggested term to make the loan affordable
+                max_term = LOAN_TYPES[loan_type]["max_term"]
+                suggested_term = self.suggest_term(loan_amount, interest_rate, monthly_income, term_years, max_term)
+                
+                if suggested_term is not None and suggested_term > term_years and suggested_term <= max_term:
+                    status_text = (
+                        f"⚠ WARNING: Monthly payment (${monthly_payment:,.2f}) "
+                        f"is {affordability['payment_ratio']:.1f}% of your income, exceeding the 50% limit. "
+                        f"Suggestion: Consider extending your term to {suggested_term} years "
+                        f"to reduce the monthly payment."
+                    )
+                else:
+                    status_text = (
+                        f"⚠ WARNING: Monthly payment (${monthly_payment:,.2f}) "
+                        f"is {affordability['payment_ratio']:.1f}% of your income, exceeding the 50% limit. "
+                        f"Consider reducing your loan amount or increasing your income."
+                    )
+                status_color = "#dc2626"  # Red
+                loan_status = "Needs Adjustment"
+            
+            self.status_label.config(text=status_text, fg=status_color)
+            
+            # Store calculation for finalization
+            self.last_calculation = {
+                "loan_type": loan_type,
+                "loan_amount": loan_amount,
+                "interest_rate": interest_rate,
+                "term": term_years,
+                "monthly_payment": monthly_payment,
+                "total_interest": total_interest,
+                "status": loan_status
             }
+            # If eligibility fails (e.g., loan amount too large compared to income), treat as Rejected
+            if not eligibility['eligible']:
+                self.status_label.config(text=f"REJECTED: {eligibility['reason']}", fg="#b91c1c")
+                # Do not show finalize dialog when rejected
+                return
 
-            # Save using our backend function
-            if save_loan_record(loan_data, "loan_records.csv"):
-                messagebox.showinfo(
-                    "Success",
-                    "Approved loan record saved successfully to loan_records.csv",
-                )
-                self.load_loan_records()  # Refresh the records display
-            else:
-                messagebox.showerror("Error", "Failed to save loan record")
+            # If payment exceeds 50% of income, don't offer finalization. Suggest adjustments.
+            if not affordability['is_affordable']:
+                max_term = LOAN_TYPES[loan_type]["max_term"]
+                suggested_term = self.suggest_term(loan_amount, interest_rate, monthly_income, term_years, max_term)
+                if suggested_term is not None and suggested_term > term_years:
+                    warn_msg = (
+                        f"Monthly payment {format_currency(monthly_payment)} is {affordability['payment_ratio']:.1f}% of your income,\n"
+                        f"which exceeds the 50% allowed debt ratio.\n\n"
+                        f"Suggestion: extend the term to {suggested_term} years to reduce the monthly payment.\n"
+                        f"Or reduce the loan amount and try again."
+                    )
+                else:
+                    warn_msg = (
+                        f"Monthly payment {format_currency(monthly_payment)} is {affordability['payment_ratio']:.1f}% of your income,\n"
+                        f"which exceeds the 50% allowed debt ratio.\n\n"
+                        "Consider reducing the loan amount or increasing your income."
+                    )
+                messagebox.showwarning("Debt Ratio Exceeded", warn_msg)
+                return
 
+            # Show a concise summary dialog with option to proceed or adjust
+            summary_msg = (
+                f"Loan Type: {loan_type}\n"
+                f"Loan Amount: {format_currency(loan_amount)}\n"
+                f"Term: {term_years} years\n"
+                f"Monthly Payment: {format_currency(monthly_payment)}\n"
+                f"Total Interest: {format_currency(total_interest)}\n"
+                f"Payment-to-Income: {affordability['payment_ratio']:.1f}%\n\n"
+                "Would you like to finalize this loan (save to CSV) or adjust inputs?"
+            )
+
+            proceed = messagebox.askyesno("Loan Summary", summary_msg)
+            if proceed:
+                # If user chooses to proceed, call finalize which will save the record
+                self.finalize_loan()
+            
         except Exception as e:
-            messagebox.showerror("Error", f"Error saving loan record: {str(e)}")
+            messagebox.showerror("Error", f"An error occurred: {str(e)}")
+    
+    def suggest_term(self, loan_amount, interest_rate, monthly_income, current_term, max_term):
+        """Suggest a term (greater than current_term) that would make the loan affordable.
 
-    def clear_form(self):
-        """Clear all form fields"""
-        self.loan_amount_var.set("")
-        self.term_years_var.set("")
-        self.monthly_income_var.set("")
+        Returns the suggested term (int) or None if no longer term up to max_term would help.
+        """
+        # Max affordable payment is 50% of monthly income
+        max_payment = monthly_income * 0.5
 
-        # Reset results
-        self.monthly_payment_var.set("$0.00")
-        self.total_interest_var.set("$0.00")
-        self.total_amount_var.set("$0.00")
-        self.debt_ratio_var.set("0.0%")
-        self.status_var.set("Ready to calculate")
-        self.warning_text.set("")
+        # Start from the next year after current term to avoid suggesting same term
+        for term in range(current_term + 1, max_term + 1):
+            payment = calculate_monthly_payment(loan_amount, interest_rate, term)
+            if payment <= max_payment:
+                return term
 
-        # Reset colors
-        self.ratio_result.config(foreground="#1f2937")
-        self.status_result.config(foreground="#1f2937")
-        self.warning_label.config(foreground="#1f2937")
-
-        # Disable save button
-        self.update_save_button(False)
-
-    def update_save_button(self, enabled):
-        """Update save button appearance based on loan approval status"""
-        if enabled:
-            # Loan is approved - enable save button
-            self.save_btn.config(
-                text="💾 Save Approved Loan",
-                bg="#059669",
-                fg="white",
-                state="normal",
-                cursor="hand2",
+        # If no term works, return None
+        return None
+    
+    def finalize_loan(self):
+        """Finalize and save the loan to CSV"""
+        if self.last_calculation is None:
+            messagebox.showwarning("No Calculation", "Please calculate a loan first before finalizing.")
+            return
+        
+        # For loans that need adjustment, ask for confirmation
+        if self.last_calculation["status"] == "Needs Adjustment":
+            proceed = messagebox.askyesno(
+                "Loan Needs Adjustment",
+                "This loan exceeds the recommended debt-to-income ratio. Do you still want to proceed?"
             )
-        else:
-            # Loan not approved or no data - disable save button
-            self.save_btn.config(
-                text="💾 Save Loan Record (Approved Only)",
-                bg="#6b7280",
-                fg="white",
-                state="disabled",
-                cursor="arrow",
-            )
-
-    def load_loan_records(self):
-        """Load and display loan records from CSV"""
+            if not proceed:
+                return
+        
+        # Save to CSV
         try:
-            self.records_text.delete("1.0", tk.END)
-
-            # Try to read the CSV file
-            import csv
-            import os
-
-            if not os.path.exists("loan_records.csv"):
-                self.records_text.insert(
-                    "1.0",
-                    "No loan records found. Create and save a loan to see records here.",
-                )
-                return
-
-            with open("loan_records.csv", "r", newline="", encoding="utf-8") as csvfile:
-                reader = csv.reader(csvfile)
-                records = list(reader)
-
-            if not records:
-                self.records_text.insert("1.0", "No loan records found.")
-                return
-
-            # Format and display records
-            header = records[0]
-            data_rows = records[1:]
-
-            # Create formatted display
-            formatted_text = "=" * 100 + "\n"
-            formatted_text += f"{'LOAN RECORDS':^100}\n"
-            formatted_text += "=" * 100 + "\n\n"
-
-            for i, record in enumerate(data_rows, 1):
-                formatted_text += f"RECORD #{i}\n"
-                formatted_text += "-" * 50 + "\n"
-
-                for j, field in enumerate(record):
-                    if j < len(header):
-                        formatted_text += f"{header[j]:<20}: {field}\n"
-
-                formatted_text += "\n"
-
-            self.records_text.insert("1.0", formatted_text)
-
+            self.save_loan_to_csv()
+            messagebox.showinfo(
+                "Loan Finalized",
+                "Loan has been finalized and saved to loan_records.csv!"
+            )
+            self.clear_form()
         except Exception as e:
-            self.records_text.insert("1.0", f"Error loading records: {str(e)}")
+            messagebox.showerror("Error", f"Failed to save loan record: {str(e)}")
+    
+    def save_loan_to_csv(self):
+        """Save loan details to CSV file"""
+        file_path = "loan_records.csv"
+        
+        # Check if file exists to determine if we need headers
+        try:
+            with open(file_path, 'x', newline='') as file:
+                writer = csv.writer(file)
+                # Write header row
+                writer.writerow([
+                    "Loan Type", "Loan Amount", "Interest Rate", 
+                    "Term", "Monthly Payment", "Total Interest", "Status"
+                ])
+                file_exists = False
+        except FileExistsError:
+            file_exists = True
+        
+        # Append the new record
+        with open(file_path, 'a', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow([
+                self.last_calculation["loan_type"],
+                f"{self.last_calculation['loan_amount']:.2f}",
+                f"{self.last_calculation['interest_rate']:.2f}",
+                self.last_calculation["term"],
+                f"{self.last_calculation['monthly_payment']:.2f}",
+                f"{self.last_calculation['total_interest']:.2f}",
+                self.last_calculation["status"]
+            ])
+        
+        return True
+    
+    def clear_form(self):
+        """Clear all input fields and results"""
+        self.loan_amount_var.set("")
+        self.term_var.set("")
+        self.income_var.set("")
+        self.loan_type_var.set("Housing")
+        self.update_loan_info()
+        
+        self.monthly_payment_label.config(text="$0.00")
+        self.total_interest_label.config(text="$0.00")
+        self.total_amount_label.config(text="$0.00")
+        self.debt_ratio_label.config(text="0.00%")
+        self.status_label.config(
+            text="Enter loan details and click Calculate",
+            fg="#7f8c8d"
+        )
+        
+        self.last_calculation = None
 
 
 def main():
-    """Main function to run the GUI application"""
+    """Main application entry point"""
     root = tk.Tk()
     app = LoanManagementGUI(root)
-
-    # Load initial records
-    app.load_loan_records()
-
-    # Start the GUI
     root.mainloop()
 
 
