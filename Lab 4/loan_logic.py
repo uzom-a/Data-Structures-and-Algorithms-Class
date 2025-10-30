@@ -111,26 +111,26 @@ def check_affordability(monthly_payment, monthly_income):
     }
 
 
-def calculate_loan_eligibility(loan_amount, monthly_income, credit_score=None):
-    """
-    Calculate basic loan eligibility
-    This is a simplified version - real banks use complex algorithms
-    """
-    # Rule: Total loan should not exceed 5 years of income
-    max_loan = monthly_income * 12 * 5
+# def calculate_loan_eligibility(loan_amount, monthly_income, credit_score=None):
+#     """
+#     Calculate basic loan eligibility
+#     This is a simplified version - real banks use complex algorithms
+#     """
+#     # Rule: Total loan should not exceed 5 years of income
+#     max_loan = monthly_income * 12 * 5
     
-    eligibility = {
-        "eligible": loan_amount <= max_loan,
-        "max_eligible_loan": round(max_loan, 2),
-        "reason": ""
-    }
+#     eligibility = {
+#         "eligible": loan_amount <= max_loan,
+#         "max_eligible_loan": round(max_loan, 2),
+#         "reason": ""
+#     }
     
-    if not eligibility["eligible"]:
-        eligibility["reason"] = f"Loan amount exceeds maximum eligible amount of ${max_loan:,.2f}"
-    else:
-        eligibility["reason"] = "Loan amount within eligible range"
+#     if not eligibility["eligible"]:
+#         eligibility["reason"] = f"Loan amount exceeds maximum eligible amount of ${max_loan:,.2f}"
+#     else:
+#         eligibility["reason"] = "Loan amount within eligible range"
     
-    return eligibility
+#     return eligibility
 
 
 def format_currency(amount):
@@ -151,7 +151,7 @@ def get_loan_summary(loan_type, loan_amount, term_years, monthly_income):
     total_interest = calculate_total_interest(monthly_payment, loan_amount, term_years)
     total_amount = loan_amount + total_interest
     affordability = check_affordability(monthly_payment, monthly_income)
-    eligibility = calculate_loan_eligibility(loan_amount, monthly_income)
+# eligibility = calculate_loan_eligibility(loan_amount, monthly_income)
     
     summary = {
         "loan_type": loan_type,
@@ -162,7 +162,7 @@ def get_loan_summary(loan_type, loan_amount, term_years, monthly_income):
         "total_interest": total_interest,
         "total_amount": total_amount,
         "affordability": affordability,
-        "eligibility": eligibility,
+        # "eligibility": eligibility,
         "monthly_income": monthly_income
     }
     

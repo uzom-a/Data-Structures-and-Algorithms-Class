@@ -14,7 +14,7 @@ from loan_logic import (
     calculate_monthly_payment,
     calculate_total_interest,
     check_affordability,
-    calculate_loan_eligibility,
+    # calculate_loan_eligibility,
     format_currency
 )
 
@@ -410,7 +410,7 @@ class LoanManagementGUI:
             total_interest = calculate_total_interest(monthly_payment, loan_amount, term_years)
             total_amount = loan_amount + total_interest
             affordability = check_affordability(monthly_payment, monthly_income)
-            eligibility = calculate_loan_eligibility(loan_amount, monthly_income)
+            # eligibility = calculate_loan_eligibility(loan_amount, monthly_income)
             
             # Update display
             self.monthly_payment_label.config(text=f"${monthly_payment:,.2f}")
@@ -460,11 +460,11 @@ class LoanManagementGUI:
                 "total_interest": total_interest,
                 "status": loan_status
             }
-            # If eligibility fails (e.g., loan amount too large compared to income), treat as Rejected
-            if not eligibility['eligible']:
-                self.status_label.config(text=f"REJECTED: {eligibility['reason']}", fg="#b91c1c")
-                # Do not show finalize dialog when rejected
-                return
+            # # If eligibility fails (e.g., loan amount too large compared to income), treat as Rejected
+            # if not eligibility['eligible']:
+            #     self.status_label.config(text=f"REJECTED: {eligibility['reason']}", fg="#b91c1c")
+            #     # Do not show finalize dialog when rejected
+            #     return
 
             # If payment exceeds 50% of income, don't offer finalization. Suggest adjustments.
             if not affordability['is_affordable']:
@@ -492,6 +492,7 @@ class LoanManagementGUI:
                 f"Loan Amount: {format_currency(loan_amount)}\n"
                 f"Term: {term_years} years\n"
                 f"Monthly Payment: {format_currency(monthly_payment)}\n"
+                f"Total number of Payments: {term_years * 12}\n"
                 f"Total Interest: {format_currency(total_interest)}\n"
                 f"Payment-to-Income: {affordability['payment_ratio']:.1f}%\n\n"
                 "Would you like to finalize this loan (save to CSV) or adjust inputs?"

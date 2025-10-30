@@ -76,7 +76,7 @@ def save_transaction(items, prices, transaction_file=TRANSACTIONS_FILE):
 
 def load_transactions(transaction_file=TRANSACTIONS_FILE):
     """Load transactions from CSV file and calculate statistics"""
-    if not os.path.isfile(transaction_file):
+    if not os.path.isfile(transaction_file): #if the file is empty, then the statistics are empty
         return {
             "transactions": [],
             "total_sales": 0,

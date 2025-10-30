@@ -1,0 +1,16 @@
+crn,course_id,name,instructor,schedule,credits,max_students,enrolled_students
+10001,CS101,Introduction to Computer Science,Dr. Smith,MWF 09:00-10:00,3,30,S1001
+10002,CS102,Data Structures,Dr. Johnson,TTh 10:00-11:30,4,30,S1002
+10003,CS201,Algorithms,Dr. Williams,MWF 11:00-12:00,3,25,
+10004,CS202,Database Systems,Dr. Brown,TTh 14:00-15:30,3,30,
+10005,CS301,Operating Systems,Dr. Davis,MWF 14:00-15:00,4,25,
+10006,MATH101,Calculus I,Prof. Miller,MWF 08:00-09:00,4,35,S1001
+10007,MATH102,Linear Algebra,Prof. Taylor,TTh 09:00-10:30,3,30,S1002
+10008,PHYS101,Physics I,Dr. Wilson,MWF 13:00-14:00,4,30,
+10009,PHYS102,Physics II,Dr. Moore,TTh 11:00-12:30,4,25,
+10010,ENG101,English Composition,Prof. Anderson,MWF 10:00-11:00,3,25,S1001
+10011,ENG201,Technical Writing,Prof. Thomas,TTh 13:00-14:30,3,25,
+10012,HIST101,World History,Dr. Jackson,MWF 15:00-16:00,3,30,
+10013,BIO101,Biology I,Dr. White,TTh 08:00-09:30,4,30,S1002
+10014,CHEM101,Chemistry I,Dr. Harris,MWF 12:00-13:00,4,28,
+10015,ECON101,Microeconomics,Prof. Martin,TTh 15:30-17:00,3,30,
